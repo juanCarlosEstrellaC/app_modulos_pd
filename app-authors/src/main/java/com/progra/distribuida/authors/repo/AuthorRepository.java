@@ -7,5 +7,4 @@ import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
 public class AuthorRepository implements PanacheRepositoryBase<Author, Integer> {
-
 }

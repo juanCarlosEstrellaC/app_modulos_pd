@@ -27,14 +27,14 @@ dependencies {
     implementation("io.quarkus:quarkus-rest-jsonb")
 
     //JPA
-    implementation("io.quarkus:quarkus-hibernate-orm-rest-data-panache")
-    implementation("io.quarkus:quarkus-jdbc-postgresql")
-    //JPA
     implementation("io.quarkus:quarkus-hibernate-orm-panache")
     implementation("io.quarkus:quarkus-jdbc-postgresql")
-    implementation("org.postgresql:postgresql:42.6.0")
 
+    //Control de versiones Flyway
+    implementation("io.quarkus:quarkus-flyway")
+    implementation("org.flywaydb:flyway-database-postgresql")
 }
+
 tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
     options.compilerArgs.add("-parameters")
