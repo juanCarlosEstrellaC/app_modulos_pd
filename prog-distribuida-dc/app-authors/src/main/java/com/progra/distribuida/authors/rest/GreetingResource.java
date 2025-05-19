@@ -1,4 +1,4 @@
-package com.progra.distribuida.authors.rest;
+package com.progra.distribuida.books.rest;
 
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;

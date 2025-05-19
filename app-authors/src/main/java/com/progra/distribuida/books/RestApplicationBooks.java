@@ -1,4 +1,4 @@
-package com.progra.distribuida.authors;
+package com.progra.distribuida.books;
 
 import jakarta.ws.rs.ApplicationPath;
 

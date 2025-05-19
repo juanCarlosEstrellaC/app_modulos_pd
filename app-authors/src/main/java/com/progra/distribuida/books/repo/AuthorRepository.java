@@ -1,7 +1,6 @@
-package com.progra.distribuida.authors.repo;
+package com.progra.distribuida.books.repo;
 
-import com.progra.distribuida.authors.db.Author;
-import io.quarkus.hibernate.orm.panache.PanacheRepository;
+import com.progra.distribuida.books.db.Author;
 import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;

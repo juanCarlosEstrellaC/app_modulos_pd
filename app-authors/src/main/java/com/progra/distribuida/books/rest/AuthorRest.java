@@ -1,7 +1,7 @@
-package com.progra.distribuida.authors.rest;
+package com.progra.distribuida.books.rest;
 
-import com.progra.distribuida.authors.db.Author;
-import com.progra.distribuida.authors.repo.AuthorRepository;
+import com.progra.distribuida.books.db.Author;
+import com.progra.distribuida.books.repo.AuthorRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;

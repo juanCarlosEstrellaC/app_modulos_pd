@@ -1,4 +1,4 @@
-package com.progra.distribuida.authors.db;
+package com.progra.distribuida.books.db;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
