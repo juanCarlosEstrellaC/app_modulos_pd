@@ -52,11 +52,11 @@ public class AuthorRest {
     public List<Author> findByBook(@PathParam("isbn") String isbn) {
         var ret = authorRepository.findByBook(isbn);
 
+        /* Para agregar el puerto al nombre del autor, pero sobreescribe el nombre original de la DB.
         Config config = ConfigProvider.getConfig();
         config.getConfigSources().forEach(obj -> {
             System.out.printf("%d -> %s\n", obj.getOrdinal(), obj.getName());
         });
-
         var puerto = config.getValue("quarkus.http.port", Integer.class);
 
         return ret.stream().map(obj -> {
@@ -64,6 +64,9 @@ public class AuthorRest {
             obj.setName(newName);
             return obj;
         }).toList();
+        */
+        // para no agregar el puerto al nombre del autor, devolver la lista de autores sin modificarla
+        return ret;
     }
 
     @POST

@@ -14,7 +14,9 @@ import java.util.Optional;
 public class AuthorRepository implements PanacheRepositoryBase<Author, Integer> {
 
     public List<Author> findByBook(String isbn) {
-        return this.find("select o.author from BookAuthor o where o.id.bookIsbn = ?1", isbn).list();
+        // Query JPQL para buscar los autores por el ISBN del libro. ba.id.bookIsbn es queda en la tabla BookAuthor, "id"
+        // es la clave compuesta y bookIsbn es el campo que contiene el ISBN del libro.
+        return this.find("SELECT ba.author FROM BookAuthor ba WHERE ba.id.bookIsbn = ?1", isbn).list();
     }
 
     public Optional<Author> update(Integer id, Author author) {

@@ -1,0 +1,14 @@
+-- INSERT INTO public.authors (name, version)
+-- VALUES ('Gabriel García Márquez', 1),
+--        ('Isabel Allende', 1),
+--        ('Mario Vargas Llosa', 1);
+--
+-- INSERT INTO public.books (isbn, title, price, version)
+-- VALUES ('101', 'Cien años de soledad', 19.99, 1),
+--        ('102', 'La casa de los espíritus', 17.50, 1),
+--        ('103', 'La ciudad y los perros', 15.00, 1);
+--
+-- INSERT INTO public.books_authors (books_isbn, authors_id)
+-- VALUES ('101', 1), -- García Márquez
+--        ('102', 2), -- Allende
+--        ('103', 3); -- Vargas Llosa
