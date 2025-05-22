@@ -26,11 +26,6 @@ public class BookRest {
     @Inject
     BooksRepository booksRepository;
 
-    @GET
-    public List<Book> findAll() {
-        return booksRepository.listAll();
-    }
-
     // Metodo para buscar por ISBN con LISTA DE AUTORES.
     @GET
     @Path("/{isbn}")
@@ -46,15 +41,63 @@ public class BookRest {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
 
-        // 1.1. Crear el DTO para devolver el libro con los autores
+        // 2. Crear el DTO para devolver el libro con los autores
         var book = obj.get();
+        BookDto bookDto = generarBookDto(book);
+
+        // 4. Devolver el DTO
+        return Response.ok(bookDto).build();
+    }
+
+    /*
+    Metodo para buscar todos los libros. Si el parámetro incluye=autores está presente, devuelve los libros con la lista de autores.
+    Endpoint para obtener todos los libros: GET http://localhost:9090/books
+    Endpoint para obtener todos los libros incluyendo autores: GET http://localhost:9090/books?incluye=autores
+    */
+    @GET
+    public Response findAll(@QueryParam("incluye") String incluye) {
+        if ("autores".equals(incluye)) {
+            // 1. Buscar todos los libros
+            var listaLibros = booksRepository.listAll();
+            if (listaLibros.isEmpty()) {
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
+
+            List<BookDto> listaLibrosDto = new ArrayList<>();
+
+            // 2. Crear el DTO para devolver los libros con los autores
+            for (Book libro : listaLibros) {
+                BookDto bookDto = generarBookDto(libro);
+
+                // Agregar el libro DTO a la lista de libros DTO
+                listaLibrosDto.add(bookDto);
+            }
+
+
+            // 4. Devolver el DTO
+            return Response.ok(listaLibrosDto).build();
+
+        }else {
+            // 1. Buscar todos los libros
+            var listaLibros = booksRepository.listAll();
+            if (listaLibros.isEmpty()) {
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
+
+            // 2. Devolver la lista de libros
+            return Response.ok(listaLibros).build();
+        }
+
+    }
+
+    private static BookDto generarBookDto(Book libro) {
         BookDto bookDto = new BookDto();
-        bookDto.setIsbn(isbn);
-        bookDto.setTitle(book.getTitle());
-        bookDto.setPrice(book.getPrice());
+        bookDto.setIsbn(libro.getIsbn());
+        bookDto.setTitle(libro.getTitle());
+        bookDto.setPrice(libro.getPrice());
 
         // 2. Buscar el inventario y agregarlo al DTO
-        var inventary = book.getInventory();
+        var inventary = libro.getInventory();
         if (inventary != null) {
             bookDto.setInventaySold(inventary.getSold());
             bookDto.setInventaySupplied(inventary.getSupplied());
@@ -66,74 +109,16 @@ public class BookRest {
         // 3.1. Obtener la lista de autores. Llamar al servicio REST de autores y los devuelve como un array de AuthorDto
         AuthorDto[] listaAutores = client.target("http://localhost:8080")
                 .path("/authors/find/{isbn}")
-                .resolveTemplate("isbn", isbn)
+                .resolveTemplate("isbn", libro.getIsbn())
                 .request(MediaType.APPLICATION_JSON)
                 .get(AuthorDto[].class);
 
-        // 3.2. Agregar la lista de autores al DTO.
+        // 3.2. Agregar la lista de Strings que seria solo los nombres de los autores al DTO.
         bookDto.setAuthors(Stream.of(listaAutores)
                 .map(AuthorDto::getName)
                 .toList()
         );
-
-        // 4. Devolver el DTO
-        return Response.ok(bookDto).build();
-    }
-
-    // Metodo para buscar por ISBN con LISTA DE AUTORES.
-    @GET
-    @Path("/todos")
-    public Response findAllWithAuthors() {
-       /* return booksRepository.findByIdOptional(isbn)
-                .map(Response::ok)
-                .orElse(Response.status(Response.Status.NOT_FOUND))
-                .build();*/
-
-        // 1. Buscar todos los libros
-        var listaLibros = booksRepository.listAll();
-        if (listaLibros.isEmpty()) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
-
-        List<BookDto> listaLibrosDto = new ArrayList<>();
-
-        // 1.1. Crear el DTO para devolver los libros con los autores
-        for (Book libro : listaLibros) {
-            BookDto bookDto = new BookDto();
-            bookDto.setIsbn(libro.getIsbn());
-            bookDto.setTitle(libro.getTitle());
-            bookDto.setPrice(libro.getPrice());
-
-            // 2. Buscar el inventario y agregarlo al DTO
-            var inventary = libro.getInventory();
-            if (inventary != null) {
-                bookDto.setInventaySold(inventary.getSold());
-                bookDto.setInventaySupplied(inventary.getSupplied());
-            }
-
-            // 3. Buscar los autores un servicio REST de otro microservicio
-            var client = ClientBuilder.newClient();         // Crea una instancia de cliente HTTP usando ClientBuilder.newClient()
-
-            // 3.1. Obtener la lista de autores. Llamar al servicio REST de autores y los devuelve como un array de AuthorDto
-            AuthorDto[] listaAutores = client.target("http://localhost:8080")
-                    .path("/authors/find/{isbn}")
-                    .resolveTemplate("isbn", libro.getIsbn())
-                    .request(MediaType.APPLICATION_JSON)
-                    .get(AuthorDto[].class);
-
-            // 3.2. Agregar la lista de Strings que seria solo los nombres de los autores al DTO.
-            bookDto.setAuthors(Stream.of(listaAutores)
-                    .map(AuthorDto::getName)
-                    .toList()
-            );
-
-            // Agregar el libro DTO a la lista de libros DTO
-            listaLibrosDto.add(bookDto);
-        }
-
-
-        // 4. Devolver el DTO
-        return Response.ok(listaLibrosDto).build();
+        return bookDto;
     }
 
 
