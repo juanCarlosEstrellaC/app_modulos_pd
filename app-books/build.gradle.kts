@@ -32,6 +32,9 @@ dependencies {
     //JPA
     implementation("io.quarkus:quarkus-hibernate-orm-panache")
     implementation("io.quarkus:quarkus-jdbc-postgresql")
+
+    // Model Mapper
+    implementation("org.modelmapper:modelmapper:3.2.3")
 }
 
 tasks.withType<JavaCompile> {

@@ -1,5 +1,6 @@
 package com.programacio.distribuida.books.rest;
 
+import com.programacio.distribuida.books.clients.AuthorRestClient;
 import com.programacio.distribuida.books.db.Book;
 import com.programacio.distribuida.books.dtos.AuthorDto;
 import com.programacio.distribuida.books.dtos.BookDto;
@@ -11,8 +12,10 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.client.ClientBuilder;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.eclipse.microprofile.rest.client.RestClientBuilder;
+import org.modelmapper.ModelMapper;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -25,6 +28,14 @@ public class BookRest {
 
     @Inject
     BooksRepository booksRepository;
+
+    @Inject
+    ModelMapper mapper;
+
+    @Inject
+    @ConfigProperty(name = "authors.url")
+    String authorsUrl;
+
 
     // Metodo para buscar por ISBN con LISTA DE AUTORES.
     @GET
@@ -49,11 +60,26 @@ public class BookRest {
         return Response.ok(bookDto).build();
     }
 
+    @GET
+    public List<BookDto> findAll() {
+        AuthorRestClient client = RestClientBuilder.newBuilder()
+                .baseUri(authorsUrl)
+                .build(AuthorRestClient.class);
+        return booksRepository.streamAll().map(book -> {
+            BookDto bookDto = new BookDto();
+            mapper.map(book, bookDto);
+            var authors = client.findByBook(book.getIsbn()).stream().map(AuthorDto::getName).toList();
+            bookDto.setAuthors(authors.stream().toList());
+            return bookDto;
+        }).toList();
+    }
+
+     /*
     /*
     Metodo para buscar todos los libros. Si el parámetro incluye=autores está presente, devuelve los libros con la lista de autores.
     Endpoint para obtener todos los libros: GET http://localhost:9090/books
     Endpoint para obtener todos los libros incluyendo autores: GET http://localhost:9090/books?incluye=autores
-    */
+    /*
     @GET
     public Response findAll(@QueryParam("incluye") String incluye) {
         if ("autores".equals(incluye)) {
@@ -77,7 +103,7 @@ public class BookRest {
             // 4. Devolver el DTO
             return Response.ok(listaLibrosDto).build();
 
-        }else {
+        } else {
             // 1. Buscar todos los libros
             var listaLibros = booksRepository.listAll();
             if (listaLibros.isEmpty()) {
@@ -88,9 +114,9 @@ public class BookRest {
             return Response.ok(listaLibros).build();
         }
 
-    }
+    }*/
 
-    private static BookDto generarBookDto(Book libro) {
+    private BookDto generarBookDto(Book libro) {
         BookDto bookDto = new BookDto();
         bookDto.setIsbn(libro.getIsbn());
         bookDto.setTitle(libro.getTitle());
@@ -107,7 +133,7 @@ public class BookRest {
         var client = ClientBuilder.newClient();         // Crea una instancia de cliente HTTP usando ClientBuilder.newClient()
 
         // 3.1. Obtener la lista de autores. Llamar al servicio REST de autores y los devuelve como un array de AuthorDto
-        AuthorDto[] listaAutores = client.target("http://localhost:8080")
+        AuthorDto[] listaAutores = client.target("") // URL del servicio REST de autores
                 .path("/authors/find/{isbn}")
                 .resolveTemplate("isbn", libro.getIsbn())
                 .request(MediaType.APPLICATION_JSON)
@@ -121,5 +147,7 @@ public class BookRest {
         return bookDto;
     }
 
-
 }
+
+
+
