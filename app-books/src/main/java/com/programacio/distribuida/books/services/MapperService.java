@@ -8,6 +8,7 @@ import org.modelmapper.ModelMapper;
 public class MapperService {
 
     @Produces
+    @ApplicationScoped
     public ModelMapper modelMapper() {
         return new ModelMapper();
     }

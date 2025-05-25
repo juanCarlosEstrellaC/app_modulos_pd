@@ -5,6 +5,7 @@ import com.programacio.distribuida.books.db.Book;
 import com.programacio.distribuida.books.dtos.AuthorDto;
 import com.programacio.distribuida.books.dtos.BookDto;
 import com.programacio.distribuida.books.repo.BooksRepository;
+import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -14,6 +15,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
+import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.modelmapper.ModelMapper;
 
 import java.util.List;
@@ -36,6 +38,18 @@ public class BookRest {
     @ConfigProperty(name = "authors.url")
     String authorsUrl;
 
+    @Inject
+    @RestClient
+    AuthorRestClient client;
+
+/*    // Inicializa el cliente REST de autores utilizando la URL configurada al iniciar el bean
+    @PostConstruct
+    public void init() {
+        // Crear el cliente REST de autores usando la URL configurada
+        client = RestClientBuilder.newBuilder()
+                .baseUri(authorsUrl)
+                .build(AuthorRestClient.class);
+    }*/
 
     // Metodo para buscar por ISBN con LISTA DE AUTORES.
     @GET
@@ -62,9 +76,6 @@ public class BookRest {
 
     @GET
     public List<BookDto> findAll() {
-        AuthorRestClient client = RestClientBuilder.newBuilder()
-                .baseUri(authorsUrl)
-                .build(AuthorRestClient.class);
         return booksRepository.streamAll().map(book -> {
             BookDto bookDto = new BookDto();
             mapper.map(book, bookDto);
@@ -129,7 +140,10 @@ public class BookRest {
             bookDto.setInventaySupplied(inventary.getSupplied());
         }
 
-        // 3. Buscar los autores un servicio REST de otro microservicio
+        var miListadeAutores = client.findByBook(libro.getIsbn()).stream().map(AuthorDto::getName).toList();
+        bookDto.setAuthors(miListadeAutores);
+
+/*        // 3. Buscar los autores un servicio REST de otro microservicio
         var client = ClientBuilder.newClient();         // Crea una instancia de cliente HTTP usando ClientBuilder.newClient()
 
         // 3.1. Obtener la lista de autores. Llamar al servicio REST de autores y los devuelve como un array de AuthorDto
@@ -143,7 +157,7 @@ public class BookRest {
         bookDto.setAuthors(Stream.of(listaAutores)
                 .map(AuthorDto::getName)
                 .toList()
-        );
+        );*/
         return bookDto;
     }
 
