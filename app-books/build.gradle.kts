@@ -35,6 +35,13 @@ dependencies {
 
     // Model Mapper
     implementation("org.modelmapper:modelmapper:3.2.3")
+
+    // Service Discovery
+    // Sirve para que el cliente pueda descubrir el servicio de libros
+    implementation("io.quarkus:quarkus-smallrye-stork")
+    implementation("io.smallrye.stork:stork-service-discovery-static-list")
+
+
 }
 
 tasks.withType<JavaCompile> {

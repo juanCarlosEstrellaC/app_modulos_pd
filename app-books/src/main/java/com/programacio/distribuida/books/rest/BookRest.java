@@ -5,6 +5,10 @@ import com.programacio.distribuida.books.db.Book;
 import com.programacio.distribuida.books.dtos.AuthorDto;
 import com.programacio.distribuida.books.dtos.BookDto;
 import com.programacio.distribuida.books.repo.BooksRepository;
+import io.smallrye.mutiny.Uni;
+import io.smallrye.stork.Stork;
+import io.smallrye.stork.api.Service;
+import io.smallrye.stork.api.ServiceInstance;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -19,6 +23,7 @@ import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.modelmapper.ModelMapper;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
 @Path("/books")
@@ -35,30 +40,38 @@ public class BookRest {
     ModelMapper mapper;
 
     @Inject
-    @ConfigProperty(name = "authors.url")
-    String authorsUrl;
-
-    @Inject
     @RestClient
     AuthorRestClient client;
 
-/*    // Inicializa el cliente REST de autores utilizando la URL configurada al iniciar el bean
-    @PostConstruct
-    public void init() {
-        // Crear el cliente REST de autores usando la URL configurada
-        client = RestClientBuilder.newBuilder()
-                .baseUri(authorsUrl)
-                .build(AuthorRestClient.class);
-    }*/
 
     // Metodo para buscar por ISBN con LISTA DE AUTORES.
     @GET
     @Path("/{isbn}")
     public Response findByIsbn(@PathParam("isbn") String isbn) {
-       /* return booksRepository.findByIdOptional(isbn)
-                .map(Response::ok)
-                .orElse(Response.status(Response.Status.NOT_FOUND))
-                .build();*/
+
+    /*  var stork = Stork.getInstance();
+
+        Map<String, Service> services = stork.getServices();
+        services.entrySet().stream().forEach(it -> {
+            var ser = it.getValue();
+            ser.getInstances().subscribe().with(ls -> {
+                ls.forEach(inst -> {
+                   System.out.println("Instancia: " + inst.getId() + " - " + inst.getHost() + ":" + inst.getPort());
+                });
+            });
+        });
+
+
+        //Obtener una instancia (microservicio) del servicio "authors-api" registrada en Stork.
+        //Esto devuelve una instancia disponible del servicio, por ejemplo, un microservicio de autores en el puerto 8080 o 8081.
+        //Uni es una clase de Mutiny que representa un valor único que puede ser emitido en el futuro (una promesa).
+
+        Service service = stork.getService("authors-api");
+        Uni<ServiceInstance> instance = service.selectInstance();
+        instance.subscribe().with(inst -> {
+            System.out.println("Instancia seleccionada: " + inst.getId() + " - " + inst.getHost() + ":" + inst.getPort());
+        });*/
+
 
         // 1. Buscar el Libro
         var obj = booksRepository.findByID(isbn);
