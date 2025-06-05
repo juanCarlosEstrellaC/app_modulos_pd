@@ -3,7 +3,7 @@
 --        ('Isabel Allende', 1),
 --        ('Mario Vargas Llosa', 1);
 --
--- INSERT INTO public.books (isbn, title, price, version)
+-- INSERT INTO public.customers (isbn, title, price, version)
 -- VALUES ('101', 'Cien años de soledad', 19.99, 1),
 --        ('102', 'La casa de los espíritus', 17.50, 1),
 --        ('103', 'La ciudad y los perros', 15.00, 1);
