@@ -38,8 +38,17 @@ dependencies {
 
     // Service Discovery
     // Sirve para que el cliente pueda descubrir el servicio de libros
+    //implementation("io.quarkus:quarkus-smallrye-stork")
+    //implementation("io.smallrye.stork:stork-service-discovery-consul")
+    // se registrará en el servidor de Consul que se ejecuta en el puerto 8500.
+
+    // Service Discovery
+    // Sirve para que el cliente pueda descubrir el servicio de libros
     implementation("io.quarkus:quarkus-smallrye-stork")
-    implementation("io.smallrye.stork:stork-service-discovery-static-list")
+    implementation("io.smallrye.stork:stork-service-discovery-consul")
+    // se registrará en el servidor de Consul que se ejecuta en el puerto 8500.
+
+    implementation("io.smallrye.reactive:smallrye.mutiny-vertx-consul-client")
 
 
 }
