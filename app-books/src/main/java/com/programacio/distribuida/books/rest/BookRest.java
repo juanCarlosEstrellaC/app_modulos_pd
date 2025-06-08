@@ -92,7 +92,11 @@ public class BookRest {
         return booksRepository.streamAll().map(book -> {
             BookDto bookDto = new BookDto();
             mapper.map(book, bookDto);
-            var authors = client.findByBook(book.getIsbn()).stream().map(AuthorDto::getName).toList();
+            var authors = client.findByBook(book.getIsbn())
+                            .stream()
+                            .map(AuthorDto::getName)
+                            .toList();
+
             bookDto.setAuthors(authors.stream().toList());
             return bookDto;
         }).toList();
