@@ -38,8 +38,14 @@ dependencies {
 
     // Service Discovery
     // Sirve para que el cliente pueda descubrir el servicio de libros
+    //implementation("io.quarkus:quarkus-smallrye-stork")
+    //implementation("io.smallrye.stork:stork-service-discovery-static-list")
+
+    // Service Discovery dinámico con Consul
     implementation("io.quarkus:quarkus-smallrye-stork")
-    implementation("io.smallrye.stork:stork-service-discovery-static-list")
+    implementation("io.smallrye.stork:stork-service-discovery-consul")
+    implementation("io.smallrye.reactive:smallrye-mutiny-vertx-consul-client") // Mutiny para programación reactiva
+
 
 
 }

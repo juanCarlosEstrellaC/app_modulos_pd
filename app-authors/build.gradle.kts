@@ -37,11 +37,7 @@ dependencies {
     // Service Discovery dinámico con Consul
     implementation("io.quarkus:quarkus-smallrye-stork")
     implementation("io.smallrye.stork:stork-service-discovery-consul")
-
-    // Mutiny para programación reactiva
-    //implementation("io.smallrye.reactive:smallrye-reactive-mutiny-vertx-consul-client:2.21.0")
-    implementation("io.smallrye.reactive:smallrye-mutiny-vertx-consul-client")
-    //implementation("io.vertx:vertx-consul-client:5.0.0")
+    implementation("io.smallrye.reactive:smallrye-mutiny-vertx-consul-client") // Mutiny para programación reactiva
 
  }
 

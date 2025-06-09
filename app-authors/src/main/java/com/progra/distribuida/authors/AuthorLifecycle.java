@@ -1,5 +1,6 @@
 package com.progra.distribuida.authors;
 
+import io.quarkus.runtime.ShutdownEvent;
 import io.quarkus.runtime.StartupEvent;
 import io.vertx.ext.consul.ConsulClientOptions;
 import io.vertx.ext.consul.ServiceOptions;
@@ -31,6 +32,7 @@ public class AuthorLifecycle {
     String serviceId;
 
     void init(@Observes StartupEvent event, Vertx vertx) throws Exception{
+        System.out.println("Starting Author Service...");
         ConsulClientOptions options = new ConsulClientOptions()
                 .setHost(consulHost)
                 .setPort(consulPort);
@@ -43,12 +45,19 @@ public class AuthorLifecycle {
         ServiceOptions serviceOptions = new ServiceOptions()
                 .setId(serviceId)
                 .setName("app-authors")
-                .setAddress(ipAddress.getHostAddress())
+                .setAddress("127.0.0.1")
+                //.setAddress(ipAddress.getHostAddress())
                 .setPort(appPort);
 
         consulClient.registerServiceAndAwait(serviceOptions);
     }
 
-    void stop() {
+    void stop(@Observes ShutdownEvent event, Vertx vertx) {
+        System.out.println("Parando Author Service...");
+        ConsulClientOptions options = new ConsulClientOptions()
+                .setHost(consulHost)
+                .setPort(consulPort);
+        ConsulClient consulClient = ConsulClient.create(vertx, options);
+        consulClient.deregisterServiceAndAwait(serviceId);
     }
 }
