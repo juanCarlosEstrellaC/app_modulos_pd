@@ -2,6 +2,7 @@ package com.programacio.distribuida.books;
 
 import io.quarkus.runtime.ShutdownEvent;
 import io.quarkus.runtime.StartupEvent;
+import io.vertx.ext.consul.CheckOptions;
 import io.vertx.ext.consul.ConsulClientOptions;
 import io.vertx.ext.consul.ServiceOptions;
 import io.vertx.mutiny.core.Vertx;
@@ -12,6 +13,7 @@ import jakarta.inject.Inject;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 import java.net.InetAddress;
+import java.util.List;
 import java.util.UUID;
 
 @ApplicationScoped
@@ -40,13 +42,31 @@ public class BookLifecycle {
 
         serviceId = UUID.randomUUID().toString();
         var ipAddress = InetAddress.getLocalHost();
+        System.out.printf("*************IP Address: %s\n", ipAddress.getHostAddress());
+
+        // Definir las etiquetas del servicio
+        var tags = List.of(
+                "traefik.enable=true",
+                "traefik.http.routers.app-books.rule=PathPrefix(`/app-books`)",
+                "traefik.http.routers.app-books.middlewares=strip-prefix-books",
+                "traefik.http.middlewares.strip-prefix-books.stripPrefix.prefixes=/app-books"
+        );
+
+        // Configurar las opciones de verificación del servicio
+        var checkOptions = new CheckOptions()
+                //.setHttp("http://127.0.0.1:9090/ping")
+                .setHttp(String.format("http://%s:%s/ping", ipAddress.getHostAddress(), appPort))
+                .setInterval("10s")
+                .setDeregisterAfter("20s");
 
         // Registrar el servicio en Consul
         ServiceOptions serviceOptions = new ServiceOptions()
                 .setId(serviceId)
                 .setName("app-books")
                 .setAddress("127.0.0.1")
-                //.setAddress(ipAddress.getHostAddress())
+                .setTags(tags)
+                .setCheckOptions(checkOptions)
+                .setAddress(ipAddress.getHostAddress())
                 .setPort(appPort);
 
         consulClient.registerServiceAndAwait(serviceOptions);

@@ -52,6 +52,7 @@ public class AuthorLifecycle {
                 "traefik.http.middlewares.strip-prefix-authors.stripPrefix.prefixes=/app-authors"
         );
 
+        // Configurar las opciones de verificación del servicio
         var checkOptions = new CheckOptions()
                 //.setHttp("http://127.0.0.1:8080/ping")
                 .setHttp(String.format("http://%s:%s/ping", ipAddress.getHostAddress(), appPort))
@@ -62,10 +63,10 @@ public class AuthorLifecycle {
         ServiceOptions serviceOptions = new ServiceOptions()
                 .setId(serviceId)
                 .setName("app-authors")
-                .setAddress("127.0.0.1")
+                //.setAddress("127.0.0.1")
                 .setTags(tags)
                 .setCheckOptions(checkOptions)
-                //.setAddress(ipAddress.getHostAddress())
+                .setAddress(ipAddress.getHostAddress())
                 .setPort(appPort);
 
         consulClient.registerServiceAndAwait(serviceOptions);
