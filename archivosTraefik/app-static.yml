@@ -1,0 +1,65 @@
+http:
+  routers:
+    router-app-authors:
+      entryPoints:
+      - http
+      rule: PathPrefix(`/app-authors`) 
+      service: service-app-authors 
+      middlewares:
+      - strip-prefix-authors
+
+    router-app-books:
+      entryPoints:
+      - http
+      rule: PathPrefix(`/app-books`)
+      service: service-app-books
+      middlewares:
+      - strip-prefix-books
+
+    router-app-customers:
+      entryPoints:
+      - http
+      rule: PathPrefix(`/app-customers`)
+      service: service-app-customers
+      middlewares:
+      - strip-prefix-customers
+     
+
+  services:
+    service-app-authors:
+      loadBalancer:
+        servers:
+          - url: "http://127.0.0.1:8080"
+          - url: "http://127.0.0.1:8081"
+
+    service-app-books:
+      loadBalancer:
+        servers:
+          - url: "http://127.0.0.1:9090"
+          - url: "http://127.0.0.1:9091"
+          - url: "http://127.0.0.1:9092"
+          - url: "http://127.0.0.1:9093"
+
+    service-app-customers:
+      loadBalancer:
+        servers:
+          - url: "http://127.0.0.1:7070"
+          - url: "http://127.0.0.1:7071"
+          - url: "http://127.0.0.1:7072"
+
+
+  middlewares:
+    strip-prefix-authors:
+      stripPrefix:
+        prefixes:
+        - "/app-authors"
+
+    strip-prefix-books:
+      stripPrefix:
+        prefixes:
+        - "/app-books"
+
+    strip-prefix-customers:
+      stripPrefix:
+        prefixes:
+        - "/app-customers"  
